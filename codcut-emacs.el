@@ -43,6 +43,7 @@
             ("language" . ,language)))))
     (url-retrieve post-endpoint 'handle-response)))
 
+;;;###autoload
 (defun share-to-codcut ()
   "Entry point function."
   (interactive)
