@@ -2,8 +2,7 @@
   "Codcut settings."
   :group 'convenience)
 
-(defcustom codcut-token
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpZCI6MiwiYXV0aGVudGljYXRpb25faWQiOjQsImFwcGxpY2F0aW9uX3R5cGUiOjEsImV4cCI6MTU5MjczMzU4OX0.Nxvm99UcYxcXJsIN-ECHrFD7HZK-3TMC8f8kxc3zHC_9ejMbOQk6TEh2mMN_iSiRJ_DWygHJUNQQTu5sizKDZcustA"
+(defcustom codcut-token nil
   "Codcut access token."
   :type '(string)
   :group 'codcut)
