@@ -1,6 +1,6 @@
 (defgroup codcut nil
   "Codcut settings."
-  :group 'convenience)
+  :group 'external)
 
 (defcustom codcut-token nil
   "Codcut access token."
