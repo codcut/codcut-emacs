@@ -7,8 +7,11 @@
   :type '(string)
   :group 'codcut)
 
-(defconst post-endpoint
+(defconst codcut-post-endpoint
   "http://localhost:8080/api/posts")
+
+(defconst codcut-post-format-string
+  "http://codcut.com/post/%d")
 
 (defun get-selected-text ()
   "Retrieve the current selected text or nil."
@@ -24,12 +27,16 @@
   "Retrieve the current major mode."
   (symbol-name major-mode))
 
-(defun handle-response (status)
-  "Handle Codcut response."
-  (kill-buffer (current-buffer)))
+(defun get-id-from-post (json-string)
+  "Get the id from a post JSON string"
+  (cdr (assoc 'id
+              (json-read-from-string json-string))))
 
-(defun post-code (code description language)
-  "Send a new post to Codcut."
+(defun generate-codcut-url (post-id)
+  (format codcut-post-format-string post-id))
+
+(defun make-post-request (code description language)
+  "Make a new post request to Codcut getting the resulting post id"
   (if (not codcut-token)
       (throw 'request-error (error "You must set codcut-token first.")))
   (let ((url-request-method "POST")
@@ -41,14 +48,37 @@
           `(("code" . ,code)
             ("body" . ,description)
             ("language" . ,language)))))
-    (url-retrieve post-endpoint 'handle-response)))
+    (let (status
+          data
+          headers)
+      (with-current-buffer
+          (url-retrieve-synchronously codcut-post-endpoint)
+        (setq status url-http-response-status)
+        (goto-char (point-min))
+        (if (re-search-forward "^$" nil t)
+            (setq headers (buffer-substring (point-min) (point))
+                  data (buffer-substring (1+ (point)) (point-max)))
+          (throw 'request-error (error "Something went wrong.")))
+        (get-id-from-post data)))))
 
 ;;;###autoload
 (defun share-to-codcut ()
-  "Entry point function."
+  "Share the selected code to Codcut"
   (interactive)
-  (let ((code 'get-selected-text)
+  (let ((code (get-selected-text))
         (description (read-string "Enter a description (optional): "))
-        (language 'get-file-extension))
+        (language (get-file-extension)))
     (catch 'request-error
-      (post-code code description language))))
+      (let ((post-id (make-post-request code description language)))
+         (message (format "New shared code at %s"
+                          (generate-codcut-url post-id)))))))
+;;;###autoload
+(defun share-to-codcut-redirect ()
+  "Share the selected code to Codcut and open the browser to the new code"
+  (interactive)
+  (let ((code (get-selected-text))
+        (description (read-string "Enter a description (optional): "))
+        (language (get-file-extension)))
+    (catch 'request-error
+      (let ((post-id (make-post-request code description language)))
+        (browse-url (generate-codcut-url post-id))))))
