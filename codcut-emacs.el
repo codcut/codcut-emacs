@@ -27,6 +27,10 @@
   "Retrieve the current major mode."
   (symbol-name major-mode))
 
+(defun get-language ()
+  "Retrieve the code language for Codcut"
+  (or (get-file-extension) (get-major-mode)))
+
 (defun get-id-from-post (json-string)
   "Get the id from a post JSON string"
   (cdr (assoc 'id
@@ -67,7 +71,7 @@
   (interactive)
   (let ((code (get-selected-text))
         (description (read-string "Enter a description (optional): "))
-        (language (get-file-extension)))
+        (language (get-language)))
     (catch 'request-error
       (let ((post-id (make-post-request code description language)))
          (message (format "New shared code at %s"
@@ -78,7 +82,7 @@
   (interactive)
   (let ((code (get-selected-text))
         (description (read-string "Enter a description (optional): "))
-        (language (get-file-extension)))
+        (language (get-language)))
     (catch 'request-error
       (let ((post-id (make-post-request code description language)))
         (browse-url (generate-codcut-url post-id))))))
