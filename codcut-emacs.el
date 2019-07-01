@@ -8,10 +8,10 @@
   :group 'codcut)
 
 (defconst codcut-post-endpoint
-  "http://localhost:8080/api/posts")
+  "https://resource.codcut.com/api/posts")
 
 (defconst codcut-post-format-string
-  "http://codcut.com/post/%d")
+  "https://codcut.com/posts/%d")
 
 (defun get-selected-text ()
   "Retrieve the current selected text or nil."
