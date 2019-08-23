@@ -1,3 +1,22 @@
+;;; codcut-emacs.el --- Codcut plugin for the Emacs editor
+     
+;; Copyright (C) 2010-2019 Diego Pasquali
+
+;; Author: Diego Pasquali <hello@dgopsq.space>
+;; Keywords: codcut, share
+;; Homepage: https://github.com/codcut/codcut-emacs
+
+;; This file is not part of GNU Emacs.
+
+;;; Commentary:
+
+;; Usage:
+;; Highlight the code you want to
+;; share and execute either `share-to-codcut`
+;; or `share-to-codcut-redirect`.
+
+;;; Code:
+
 (defgroup codcut nil
   "Codcut settings."
   :group 'external)
@@ -86,3 +105,5 @@
     (catch 'request-error
       (let ((post-id (make-post-request code description language)))
         (browse-url (generate-codcut-url post-id))))))
+
+;;; codcut-emacs.el ends here
