@@ -5,6 +5,7 @@
 ;; Author: Diego Pasquali <hello@dgopsq.space>
 ;; Keywords: codcut, share
 ;; Homepage: https://github.com/codcut/codcut-emacs
+;; Package-Version: 0.0.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -16,6 +17,8 @@
 ;; or `share-to-codcut-redirect`.
 
 ;;; Code:
+
+(require 'json)
 
 (defgroup codcut nil
   "Codcut settings."
@@ -47,21 +50,27 @@
   (symbol-name major-mode))
 
 (defun get-language ()
-  "Retrieve the code language for Codcut"
+  "Retrieve the code language for Codcut."
   (or (get-file-extension) (get-major-mode)))
 
 (defun get-id-from-post (json-string)
-  "Get the id from a post JSON string"
+  "Get the id from a post JSON string.
+- JSON-STRING: A json string representing a Post"
   (cdr (assoc 'id
               (json-read-from-string json-string))))
 
 (defun generate-codcut-url (post-id)
+  "Generate a post URL.
+- POST-ID: The post's id"
   (format codcut-post-format-string post-id))
 
 (defun make-post-request (code description language)
-  "Make a new post request to Codcut getting the resulting post id"
+  "Make a new post request to Codcut getting the resulting post id.
+- CODE: The code to share.
+- DESCRIPTION: The code description (optional).
+- LANGUAGE: The language used by the code."
   (if (not codcut-token)
-      (throw 'request-error (error "You must set codcut-token first.")))
+      (throw 'request-error (error "You must set codcut-token first")))
   (let ((url-request-method "POST")
         (url-request-extra-headers
          `(("Authorization" . ,(format "Bearer %s" codcut-token))
@@ -76,17 +85,17 @@
           headers)
       (with-current-buffer
           (url-retrieve-synchronously codcut-post-endpoint)
-        (setq status url-http-response-status)
+        (setq status 'url-http-response-status)
         (goto-char (point-min))
         (if (re-search-forward "^$" nil t)
             (setq headers (buffer-substring (point-min) (point))
                   data (buffer-substring (1+ (point)) (point-max)))
-          (throw 'request-error (error "Something went wrong.")))
+          (throw 'request-error (error "Something went wrong")))
         (get-id-from-post data)))))
 
 ;;;###autoload
 (defun share-to-codcut ()
-  "Share the selected code to Codcut"
+  "Share the selected code to Codcut."
   (interactive)
   (let ((code (get-selected-text))
         (description (read-string "Enter a description (optional): "))
@@ -97,7 +106,7 @@
                           (generate-codcut-url post-id)))))))
 ;;;###autoload
 (defun share-to-codcut-redirect ()
-  "Share the selected code to Codcut and open the browser to the new code"
+  "Share the selected code to Codcut and open the browser to the new code."
   (interactive)
   (let ((code (get-selected-text))
         (description (read-string "Enter a description (optional): "))
