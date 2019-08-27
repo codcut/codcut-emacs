@@ -1,4 +1,4 @@
-;;; codcut-emacs --- Codcut plugin for the Emacs editor
+;;; codcut-emacs.el --- Codcut plugin for the Emacs editor
      
 ;; Copyright (C) 2010-2019 Diego Pasquali
 
