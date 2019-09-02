@@ -1,11 +1,11 @@
-;;; codcut-emacs.el --- Codcut plugin for the Emacs editor
+;;; codcut.el --- Share pieces of code to Codcut
      
 ;; Copyright (C) 2010-2019 Diego Pasquali
 
 ;; Author: Diego Pasquali <hello@dgopsq.space>
-;; Keywords: codcut, share
+;; Keywords: comm, tools, codcut, share
 ;; Homepage: https://github.com/codcut/codcut-emacs
-;; Package-Version: 0.0.1
+;; Version: 0.0.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -35,36 +35,36 @@
 (defconst codcut-post-format-string
   "https://codcut.com/posts/%d")
 
-(defun get-selected-text ()
+(defun codcut-get-selected-text ()
   "Retrieve the current selected text or nil."
   (if (use-region-p)
       (buffer-substring (region-beginning) (region-end)) nil))
 
-(defun get-file-extension ()
+(defun codcut-get-file-extension ()
   "Retrieve the file extension or nil."
   (if (buffer-file-name)
       (file-name-extension (buffer-file-name)) nil))
 
-(defun get-major-mode ()
+(defun codcut-get-major-mode ()
   "Retrieve the current major mode."
   (symbol-name major-mode))
 
-(defun get-language ()
+(defun codcut-get-language ()
   "Retrieve the code language for Codcut."
-  (or (get-file-extension) (get-major-mode)))
+  (or (codcut-get-file-extension) (codcut-get-major-mode)))
 
-(defun get-id-from-post (json-string)
+(defun codcut-get-id-from-post (json-string)
   "Get the id from a post JSON string.
 - JSON-STRING: A json string representing a Post"
   (cdr (assoc 'id
               (json-read-from-string json-string))))
 
-(defun generate-codcut-url (post-id)
+(defun codcut-generate-url (post-id)
   "Generate a post URL.
 - POST-ID: The post's id"
   (format codcut-post-format-string post-id))
 
-(defun make-post-request (code description language)
+(defun codcut-make-post-request (code description language)
   "Make a new post request to Codcut getting the resulting post id.
 - CODE: The code to share.
 - DESCRIPTION: The code description (optional).
@@ -91,28 +91,29 @@
             (setq headers (buffer-substring (point-min) (point))
                   data (buffer-substring (1+ (point)) (point-max)))
           (throw 'request-error (error "Something went wrong")))
-        (get-id-from-post data)))))
+        (codcut-get-id-from-post data)))))
 
 ;;;###autoload
-(defun share-to-codcut ()
+(defun codcut-share ()
   "Share the selected code to Codcut."
   (interactive)
-  (let ((code (get-selected-text))
+  (let ((code (codcut-get-selected-text))
         (description (read-string "Enter a description (optional): "))
-        (language (get-language)))
+        (language (codcut-get-language)))
     (catch 'request-error
-      (let ((post-id (make-post-request code description language)))
+      (let ((post-id (codcut-make-post-request code description language)))
          (message (format "New shared code at %s"
-                          (generate-codcut-url post-id)))))))
+                          (codcut-generate-url post-id)))))))
 ;;;###autoload
-(defun share-to-codcut-redirect ()
+(defun codcut-share-redirect ()
   "Share the selected code to Codcut and open the browser to the new code."
   (interactive)
-  (let ((code (get-selected-text))
+  (let ((code (codcut-get-selected-text))
         (description (read-string "Enter a description (optional): "))
-        (language (get-language)))
+        (language (codcut-get-language)))
     (catch 'request-error
-      (let ((post-id (make-post-request code description language)))
-        (browse-url (generate-codcut-url post-id))))))
+      (let ((post-id (codcut-make-post-request code description language)))
+        (browse-url (codcut-generate-url post-id))))))
 
-;;; codcut-emacs.el ends here
+(provide 'codcut)
+;;; codcut.el ends here
