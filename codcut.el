@@ -102,8 +102,8 @@
         (language (codcut-get-language)))
     (catch 'request-error
       (let ((post-id (codcut-make-post-request code description language)))
-         (message (format "New shared code at %s"
-                          (codcut-generate-url post-id)))))))
+        (message "New shared code at %s"
+                 (codcut-generate-url post-id))))))
 ;;;###autoload
 (defun codcut-share-redirect ()
   "Share the selected code to Codcut and open the browser to the new code."
