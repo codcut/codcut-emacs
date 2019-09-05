@@ -80,16 +80,12 @@
           `(("code" . ,code)
             ("body" . ,description)
             ("language" . ,language)))))
-    (let (status
-          data
-          headers)
+    (let (data)
       (with-current-buffer
           (url-retrieve-synchronously codcut-post-endpoint)
-        (setq status 'url-http-response-status)
         (goto-char (point-min))
-        (if (re-search-forward "^$" nil t)
-            (setq headers (buffer-substring (point-min) (point))
-                  data (buffer-substring (1+ (point)) (point-max)))
+        (if (and (eq url-http-response-status 200) (re-search-forward "^$" nil t))
+            (setq data (buffer-substring (1+ (point)) (point-max)))
           (throw 'request-error (error "Something went wrong")))
         (codcut-get-id-from-post data)))))
 
