@@ -20,6 +20,8 @@
 
 (require 'json)
 
+(defvar url-http-response-status)
+
 (defgroup codcut nil
   "Codcut settings."
   :group 'external)
@@ -83,7 +85,6 @@
     (let (data)
       (with-current-buffer
           (url-retrieve-synchronously codcut-post-endpoint)
-        (defvar url-http-response-status)
         (goto-char (point-min))
         (if (and (eq url-http-response-status 200) (re-search-forward "^$" nil t))
             (setq data (buffer-substring (1+ (point)) (point-max)))
